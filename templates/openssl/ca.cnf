@@ -1,0 +1,125 @@
+oid_section  = new_oids
+
+[ new_oids ]
+
+tsa_policy1 = 1.2.3.4.1
+tsa_policy2 = 1.2.3.4.5.6
+tsa_policy3 = 1.2.3.4.5.7
+
+[ ca ]
+default_ca    = CA_default
+
+[ CA_default ]
+dir               = ${ROOT_DIR}
+certs             = $dir
+crl_dir           = $dir
+new_certs_dir     = $dir
+database          = $dir/index.txt
+serial            = $dir/serial
+RANDFILE          = $dir/.rand
+certificate       = $dir/ca.cert.pem
+crlnumber         = $dir/crlnumber
+crl               = $dir/crl.pem
+private_key       = $dir/ca.key.pem
+
+x509_extensions   = usr_cert 
+name_opt          = ca_default
+cert_opt          = ca_default
+
+default_days      = 365
+default_crl_days  = 30
+default_md        = default
+preserve          = no
+policy            = policy_match
+
+[ policy_match ]
+countryName       = match
+stateOrProvinceName = match
+organizationName    = match
+organizationalUnitName = optional
+commonName        = supplied
+emailAddress      = optional
+
+[ policy_anything ]
+countryName        = optional
+stateOrProvinceName = optional
+localityName       = optional
+organizationName   = optional
+organizationalUnitName = optional
+commonName         = supplied
+emailAddress       = optional
+
+[ req ]
+default_bits        = 4096
+default_keyfile     = privkey.pem
+distinguished_name  = req_distinguished_name
+attributes          = req_attributes
+x509_extensions     = v3_ca    
+string_mask = utf8only
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+stateOrProvinceName             = State or Province Name
+localityName                    = Locality Name
+0.organizationName              = Organization Name
+organizationalUnitName          = Organizational Unit Name
+commonName                      = Common Name
+emailAddress                    = Email Address
+
+# Optionally, specify some defaults.
+countryName_default             = ${COUNTRY}
+stateOrProvinceName_default     = ${STATE}
+localityName_default            = ${CITY}
+0.organizationName_default      = ${ORG}
+organizationalUnitName_default  = ${UNIT}
+emailAddress_default            = ${EMAIL}
+
+[ req_attributes ]
+challengePassword               = A challenge password
+challengePassword_min           = 4
+challengePassword_max           = 20
+unstructuredName                = An optional company name
+
+[ usr_cert ]
+basicConstraints=CA:TRUE
+nsComment            = "OpenSSL Generated Certificate"
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints = CA:true
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always
+
+[ proxy_cert_ext ]
+basicConstraints=CA:FALSE
+nsComment            = "OpenSSL Generated Certificate"
+
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+proxyCertInfo=critical,language:id-ppl-anyLanguage,pathlen:3,policy:foo
+
+[ tsa ]
+default_tsa = tsa_config1
+
+[ tsa_config1 ]
+dir             = ./demoCA
+serial          = $dir/tsaserial
+crypto_device   = builtin
+signer_cert     = $dir/tsacert.pem
+certs           = $dir/cacert.pem
+signer_key      = $dir/private/tsakey.pem
+default_policy  = tsa_policy1
+other_policies  = tsa_policy2, tsa_policy3
+digests         = md5, sha1
+accuracy        = secs:1, millisecs:500, microsecs:100 
+clock_precision_digits = 0
+ordering        = yes
+tsa_name        = yes 
+ess_cert_id_chain = no
